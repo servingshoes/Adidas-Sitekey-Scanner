@@ -6,12 +6,6 @@ import requests
 from slacker import Slacker
 from bs4 import BeautifulSoup
 
-# custom coded libraries
-from classes.logger import logger
-log = logger().log
-
-# if you plan on using this script, please dont delete the below line
-
 consumer_key = "Consumer API Key"
 consumer_secret = "Consumer Secret API Key"
 access_token = "Access Token API Key"
@@ -23,10 +17,10 @@ auth.set_access_token(access_token, access_token_secret)
 api = tweepy.API(auth)
 
 try:
-    request = requests.get('http://www.adidas.com/us/men-shoes?sz=120&start=0', headers={'User-Agent' : "Magic Browser"})
-    log("Page Loaded", "success")
+    request = requests.get('http://www.adidas.co.uk/men-shoes?sz=120&start=0', headers={'User-Agent' : "Magic Browser"})
+    print("\033[92mPage Loaded\033[00m")
 except:
-    log("Error, page was not able to be loaded!", "error")
+    print("\033[91mError, page was not able to be loaded!\033[00m")
     sys.exit()
 
 request_content = BeautifulSoup(request.content, "html.parser")
@@ -38,7 +32,7 @@ i = 0
 for products in all:
     links.append(products.find('a')['href'])
 
-log(str(len(links)) + " links were found!")
+print('\033[96m' + str(len(links)) + " links were found!\033[00m")
 
 for link in links:
     session = requests.Session()
@@ -54,11 +48,11 @@ for link in links:
     captcha = response_content.find_all('div',{"class":"g-recaptcha"})
     i += 1
     if captcha:
-        log(str(i) + "/" + str(len(links)) + ' Captcha has been found @ ' + link + ' !', "success")
-        log("Current Sitekey: " + captcha[0]['data-sitekey'])
+        print('\033[92m' + str(i) + "/" + str(len(links)) + ' Captcha has been found @ ' + link + ' !\033[00m')
+        print("\033[92mCurrent Sitekey: " + captcha[0]['data-sitekey'] + '\033[00m')
         api.update_status("Current Sitekey: " + captcha[0]['data-sitekey'])
         break
 
     else:
-        log(str(i) + "/" + str(len(links)) + ' Captcha has not been found on product @ ' + link + " !", "yellow")
+        print('\033[93m' + str(i) + "/" + str(len(links)) + ' Captcha has not been found on product @ ' + link + " !\033[00m")
         continue
